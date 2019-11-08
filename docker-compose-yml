@@ -1,0 +1,44 @@
+version: '2'
+services:
+  mihospedaje-ldap:
+    image: osixia/openldap:1.1.8
+    hostname: arqsoft.org
+    environment:
+      COMPOSE_HTTP_TIMEOUT: '200'
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_BACKEND: hdb
+      LDAP_BASE_DN: ''
+      LDAP_CONFIG_PASSWORD: config
+      LDAP_DOMAIN: arqsoft.unal.edu.co
+      LDAP_LOG_LEVEL: '256'
+      LDAP_ORGANISATION: Software Architecture
+      LDAP_READONLY_USER: 'false'
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: 'true'
+      LDAP_REPLICATION: 'false'
+      LDAP_SSL_HELPER_PREFIX: ldap
+      LDAP_TLS: 'true'
+      LDAP_TLS_CA_CRT_FILENAME: ca.crt
+      LDAP_TLS_CIPHER_SUITE: SECURE256:-VERS-SSL3.0
+      LDAP_TLS_CRT_FILENAME: ldap.crt
+      LDAP_TLS_ENFORCE: 'false'
+      LDAP_TLS_KEY_FILENAME: ldap.key
+      LDAP_TLS_PROTOCOL_MIN: '3.1'
+      LDAP_TLS_VERIFY_CLIENT: demand
+    stdin_open: true
+    volumes:
+    - /container/service/slapd/assets/certs/
+    - /etc/ldap/slapd.d
+    - /var/lib/ldap
+    tty: true
+    ports:
+    - 389:389/tcp
+    - 636:636/tcp
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_HTTPS: 'false'
+      PHPLDAPADMIN_LDAP_HOSTS: mihospedaje-ldap
+    links:
+    - mihospedaje-ldap:mihospedaje-ldap
+    ports:
+    - 8085:80/tcp
